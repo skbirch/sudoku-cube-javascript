@@ -1,0 +1,114 @@
+
+/* The Magic Float Center Code */
+.float_center {
+  float: right;
+  position: relative;
+  left: -50%;
+  text-align: left;
+}
+.float_center > .child {
+  position: relative;
+  left: 50%;
+}
+
+.clear {
+  clear:both;
+}
+
+#title {
+  font-family: arial, sans-serif;
+  text-align: center;
+  color: #275929;
+  margin: 40px 0 0 0;
+}
+
+#title2 {
+  font-family: arial, sans-serif;
+  text-align: center;
+  color: #275929;
+  margin: 40px 0 0 0;
+}
+
+.container {
+  display: flex;
+  width: 50%;
+  height: 50%;
+  margin: 20px auto 0 auto;
+  border: 5px solid #275929;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+#left {
+  width: 50%;
+  margin: 20px;
+  border: 5px solid #cae8cb;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+#right {
+  width: 50%;
+  margin: 20px;
+  border: 5px solid #275929;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.btngroup input {
+display: none;
+margin: auto;
+width: 50%;
+}
+
+.btngroup .button {
+  background-color: #a6d8a8;
+  float: right;
+  margin: 3px;
+  width: 50px;
+  height:50px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btngroup .display {
+  background-color: #cae8cb;
+  float: right;
+  margin: 3px;
+  width: 50px;
+  height:50px;
+  border-radius: 8px;
+}
+
+.btngroup input:checked + .button { background-color: #275929; }
+.btngroup input:checked + .display { background-color: #275929; }
+
+/* Clear floats (clearfix hack) */
+.btngroup:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.selector {
+  background-color: #a6d8a8; /* Green */
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 50px 10px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.selector1 {
+  background-color: #275929; 
+  color: white; 
+}
+
+.selector1:hover {
+  background-color: #4CAF50;
+  color: white;
+}
