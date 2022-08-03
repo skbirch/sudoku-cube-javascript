@@ -5,28 +5,9 @@
   <script src="scripts.js"></script>
 </head>
 <h1 id="title">Lorem Ipsum</h1>
+<div id= "0"></div>
+
   <script>
-    
-    /*
-    var face1 = new Array(16);
-    var face2 = new Array(16);
-    var face3 = new Array(16);
-    var face4 = new Array(16);
-    var face5 = new Array(16);
-    var face6 = new Array(16);
-    var slab1 = new Array(16);
-    var slab2 = new Array(16);
-    var slab3 = new Array(16);
-    var slab4 = new Array(16);
-    var slce1 = new Array(16);
-    var slce2 = new Array(16);
-    var slce3 = new Array(16);
-    var slce4 = new Array(16);
-    var wall1 = new Array(16);
-    var wall2 = new Array(16);
-    var wall3 = new Array(16);
-    var wall4 = new Array(16);
-    */
     var validCubeList = []
     // ----------------- for (var i = 0; i <= 99; i++) {
       let cube = {
@@ -38,11 +19,12 @@
         complete: false
       };
       console.log(cube);
-      populateValidCube(cube);
-      assignIds(cube.faces);
+      // populateValidCube(cube);
+      assignPositionalIds(cube.faces);
     // cube.faces[3].Matrix[1][2] = "Test";
     // 
       syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
+      displayFaces(cube.faces[0], "0");
 
       // -------------- while (cube.valid == true && cube.complete == false) {
         waveformCollapse(cube);
@@ -52,6 +34,7 @@
         validCubeList.push(cube);        
       }
       console.log(cube);
+
     // ----------------- }
     // ------------------ console.log(validCubeList);
     /*

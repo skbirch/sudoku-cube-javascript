@@ -1,5 +1,6 @@
 // Object Definition //
 function Face() {
+  this.id = null;
     this.Matrix = new Array(4).fill().map(()=>Array(4).fill());
     this.PopulateMatrix = function() {
       this.Matrix.forEach(line => line.fill(Array.from(new Array(16), (x, i) => i)));
@@ -20,19 +21,22 @@ function Face() {
   }
 
 function Slab() {
-    this.Matrix = new Array();
+  this.id = null;
+  this.Matrix = new Array();
 }
 
 function Slice() {
-    this.Matrix = new Array();
+  this.id = null;
+  this.Matrix = new Array();
 }
 
 function Wall() {
-    this.Matrix = new Array();
+  this.id = null;
+  this.Matrix = new Array();
 }
 
 // Object Instantiation //
-function assignIds(faces) {
+function assignPositionalIds(faces) {
   var id = 0;
   for (var i = 0; i <= 5; i++) {
     for (var j = 0; j <= 3; j++) {
@@ -44,6 +48,14 @@ function assignIds(faces) {
   }
 }
 
+function assignIds(array) {
+  var id = 0;
+  for (var i = 0; i <= array.length - 1; i++) {
+    array[i].id = id;
+    id++;
+  }
+}
+
 function createFaces(count) {
   var faceArray = [];
   for (var i = 0; i <= count - 1; i++) {
@@ -51,6 +63,7 @@ function createFaces(count) {
   newFace.PopulateMatrix();
   faceArray.push(newFace);
   }
+  assignIds(faceArray);
   return faceArray;
 }
 
@@ -60,6 +73,7 @@ function createSlabs(count) {
   var newSlab = new Slab();
   slabArray.push(newSlab);
   }
+  assignIds(slabArray);
   return slabArray;
 }
 
@@ -69,6 +83,7 @@ function createSlices(count) {
   var newSlice = new Slice();
   sliceArray.push(newSlice);
   }
+  assignIds(sliceArray);
   return sliceArray;
 }
 function createWalls(count) {
@@ -77,6 +92,7 @@ function createWalls(count) {
   var newWall = new Wall();
   wallArray.push(newWall);
   }
+  assignIds(wallArray);
   return wallArray;
 }
 
@@ -154,14 +170,16 @@ function waveformCollapse(cube) {
     }
   }
   // console.log(choiceList);
-  var randomValue = choiceList.sample();
-  var randomNumber = randomValue[1].sample();
-  var foundFace = searchArray(cube.faces.length, cube.faces, randomValue[0]);
-  var foundSlab = searchArray(cube.slabs.length, cube.slabs, randomValue[0]);
-  var foundSlice = searchArray(cube.slices.length, cube.slices, randomValue[0]);
-  var foundWall = searchArray(cube.walls.length, cube.walls, randomValue[0]);
+  var randomValue = ["id5", [6]]// choiceList.sample();
+  var foundNumber = randomValue[1].sample();
+  var foundFace = searchAndRemoveFromArray(cube.faces, randomValue, foundNumber);
+  var foundSlab = searchAndRemoveFromArray(cube.slabs, randomValue, foundNumber);
+  var foundSlice = searchAndRemoveFromArray(cube.slices, randomValue, foundNumber);
+  var foundWall = searchAndRemoveFromArray(cube.walls, randomValue, foundNumber);
 
-  removeOptions(cube.faces, foundFace, randomValue, randomNumber);
+  console.log("Face: " + foundFace + " | Slab: " + foundSlab + " | Slice: " + foundSlice + " | Wall: " + foundWall + " | Value: " + randomValue + " | Number: " + foundNumber);
+
+  // reduceSuperPosition(cube, foundFace, foundSlab, foundSlice, foundWall, foundNumber);
   // console.log(randomValue);
   // console.log("Face: " + JSON.stringify(foundFace));
   // console.log("Slab: " + JSON.stringify(foundSlab));
@@ -170,21 +188,51 @@ function waveformCollapse(cube) {
 
 }
 
-function searchArray(length, arrayList, value) {
-  var foundArray = null;
-  for (var i = 0; i <= length - 1; i++) {
+/*
+function searchArray(arrayList, value) {
+  for (var i = 0; i <= arrayList.length - 1; i++) {
     var flatArray = Array.prototype.concat.apply([], arrayList[i].Matrix);
     console.log(flatArray);
-    var possibleValue = flatArray.find(function(element) {return element[0] == value});
-    if (possibleValue !== null) {foundArray = arrayList[i]};
-  }
-  return foundArray;
 
+    // could this be filter?
+    var possibleValue = flatArray.find(function(element) {return element[0] == value});
+    console.log("Possible Value: " + possibleValue + " found in: " + arrayList[i]);
+    if (possibleValue == null || possibleValue == undefined) {
+      continue;
+      // console.log(foundArray);
+    };
+  }
+  console.log(arrayList[i].id);
+  return arrayList[i].id;
 
 }
+*/
 
-function removeOptions() {
+// this is not good
+function searchAndRemoveFromArray(arrayList, value, foundNumber) {
+  for (var i = 0; i <= arrayList.length - 1; i++) {
+    for (var j = 0; j <= arrayList[i].Matrix.length - 1; j++) {
+      for (var k = 0; k <= arrayList[i].Matrix[j].length - 1; k++) {
+        if (arrayList[i].Matrix[j][k][0] == value[0]) {
+          // console.log(arrayList[i].Matrix[j][k][0]);
+          reduceSuperPosition(arrayList[i], foundNumber);
+          console.log(arrayList[i]);
+          arrayList[i].Matrix[j][k][1] = [foundNumber];// arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber);
 
+          // console.log(arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber));
+          return arrayList[i].id;
+        }
+      }
+    }
+  }
+}
+
+function reduceSuperPosition(array, num) {
+  for (var i = 0; i <= 3; i++) {
+    for (var j = 0; j <= 3; j++) {
+      array.Matrix[i][j][1] = array.Matrix[i][j][1].filter(item => item !== num);
+    }
+  }
 }
 
 function checkValidity(cube) {
@@ -197,7 +245,18 @@ function checkValidity(cube) {
 }
 
 
-
+function displayFaces(face, id) {
+  var html = "<table border='1|1'>";
+  for (var i = 0; i <= 3; i++) {
+    html+="<tr>";
+    for (var j = 0; j <= 3; j++) {
+    html+="<td>"+face.Matrix[i][j]+"</td>";
+    }
+    html+="</tr>";
+  }
+  html+="</table>";
+document.getElementById(id).innerHTML = html;
+}
 
 
 
