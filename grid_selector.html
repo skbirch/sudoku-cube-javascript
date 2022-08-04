@@ -5,7 +5,15 @@
   <script src="scripts.js"></script>
 </head>
 <h1 id="title">Lorem Ipsum</h1>
-<div id= "0"></div>
+<div id= "4"></div>
+<div style="display: flex">
+  <div id= "0"></div>
+  <div id= "1"></div>
+  <div id= "2"></div>
+  <div id= "3"></div>
+</div>
+<div id= "5"></div>
+
 
   <script>
     var validCubeList = []
@@ -19,12 +27,12 @@
         complete: false
       };
       console.log(cube);
-      // populateValidCube(cube);
+      populateValidCube(cube);
       assignPositionalIds(cube.faces);
     // cube.faces[3].Matrix[1][2] = "Test";
     // 
       syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
-      displayFaces(cube.faces[0], "0");
+      displayAllFaces(cube);
 
       // -------------- while (cube.valid == true && cube.complete == false) {
         waveformCollapse(cube);

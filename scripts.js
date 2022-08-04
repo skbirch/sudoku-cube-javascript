@@ -245,12 +245,12 @@ function checkValidity(cube) {
 }
 
 
-function displayFaces(face, id) {
-  var html = "<table border='1|1'>";
+function displayFaces(face, id, color) {
+  var html = "<table style='table-layout: fixed; width: 350px; background-color:" + color + ";' border='1|1'>";
   for (var i = 0; i <= 3; i++) {
     html+="<tr>";
     for (var j = 0; j <= 3; j++) {
-    html+="<td>"+face.Matrix[i][j]+"</td>";
+    html+="<td style='word-wrap: break-word'>"+displayCellContents(face.Matrix[i][j][1])+"</td>";
     }
     html+="</tr>";
   }
@@ -258,8 +258,29 @@ function displayFaces(face, id) {
 document.getElementById(id).innerHTML = html;
 }
 
+function displayCellContents(cell) {
+  var html = "<table>"
+    for (var i = 0; i <= 3; i++) {
+      html+="<tr>";
+      for (var j = 0; j <= 3; j++) {
+        html+="<td>"+ cell[(i * 4) + j] ??= '' +"</td>";
+      }
+    html+="</tr>";
+  }
+  html+="</table>";
+
+  return html;
+}
 
 
+function displayAllFaces(cube) {
+  displayFaces(cube.faces[0], "0", "white");
+  displayFaces(cube.faces[1], "1", "red");
+  displayFaces(cube.faces[2], "2", "yellow");
+  displayFaces(cube.faces[3], "3", "orange");
+  displayFaces(cube.faces[4], "4", "blue");
+  displayFaces(cube.faces[5], "5", "green");
+}
 
 
 
