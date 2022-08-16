@@ -1,0 +1,62 @@
+<!Doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="styles.css">
+  <script src="scripts.js"></script>
+</head>
+<h1 id="title">Lorem Ipsum</h1>
+<h2>Faces</h2>
+<div id= "4"></div>
+<div style="display: flex">
+  <div id= "0"></div>
+  <div id= "1"></div>
+  <div id= "2"></div>
+  <div id= "3"></div>
+</div>
+<div id= "5"></div>
+<h2>Slabs</h2>
+<div id= "6"></div>
+<div id= "7"></div>
+<div id= "8"></div>
+<div id= "9"></div>
+<h2>Slices</h2>
+<div id= "10"></div>
+<div id= "11"></div>
+<div id= "12"></div>
+<div id= "13"></div>
+<h2>Walls</h2>
+<div id= "14"></div>
+<div id= "15"></div>
+<div id= "16"></div>
+<div id= "17"></div>
+  <script>
+    var validCubeList = []
+    for (var i = 0; i <= 900; i++) {
+      let cube = {
+        faces: createFaces(6),
+        slabs: createSlabs(4),
+        slices: createSlices(4),
+        walls: createWalls(4),
+        valid: true,
+        complete: false
+      };
+
+      assignPositionalIds(cube.faces);
+      setFaceColors(cube)
+      syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
+      displayAll(cube);
+      var count = 0;
+      while (cube.valid == true && cube.complete == false) {
+        waveformCollapse(cube);
+        displayAll(cube);
+        checkValidity(cube);
+        count += 1;
+      }
+      if (count >= 90 ) {console.log(count)};
+      if (cube.complete == true) {
+        validCubeList.push(cube);        
+      }
+    }
+    console.log(validCubeList);
+  </script>
+</html>
