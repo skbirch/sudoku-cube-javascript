@@ -31,6 +31,7 @@
 <div id= "17"></div>
   <script>
     var validCubeList = []
+    var maxCount = 0;
     for (var i = 0; i <= 900; i++) {
       let cube = {
         faces: createFaces(6),
@@ -43,17 +44,23 @@
 
       assignPositionalIds(cube.faces);
       setFaceColors(cube)
+      // populateValidCube(cube);
       syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
       displayAll(cube);
       var count = 0;
+
       while (cube.valid == true && cube.complete == false) {
         waveformCollapse(cube);
         displayAll(cube);
         checkValidity(cube);
         count += 1;
       }
-      if (count >= 90 ) {console.log(count)};
+      if (count > maxCount) {
+        maxCount = count;
+        console.log(maxCount);
+      }
       if (cube.complete == true) {
+        console.log("We Got One!!!")
         validCubeList.push(cube);        
       }
     }
