@@ -1,4 +1,5 @@
 // Object Definition //
+// Create Face template
 function Face() {
   this.id = null;
   this.color = null;
@@ -21,18 +22,21 @@ function Face() {
     }
   }
 
+// Create slab template
 function Slab() {
   this.id = null;
   this.color = null;
   this.Matrix = new Array();
 }
 
+// Create slice template
 function Slice() {
   this.id = null;
   this.color = null;
   this.Matrix = new Array();
 }
 
+// Create wall template
 function Wall() {
   this.id = null;
   this.color = null;
@@ -180,37 +184,7 @@ function waveformCollapse(cube) {
   var foundSlab = searchAndRemoveFromArray(cube.slabs, randomValue, foundNumber);
   var foundSlice = searchAndRemoveFromArray(cube.slices, randomValue, foundNumber);
   var foundWall = searchAndRemoveFromArray(cube.walls, randomValue, foundNumber);
-
-  // console.log("Face: " + foundFace + " | Slab: " + foundSlab + " | Slice: " + foundSlice + " | Wall: " + foundWall + " | Value: " + randomValue + " | Number: " + foundNumber);
-
-  // reduceSuperPosition(cube, foundFace, foundSlab, foundSlice, foundWall, foundNumber);
-  // console.log(randomValue);
-  // console.log("Face: " + JSON.stringify(foundFace));
-  // console.log("Slab: " + JSON.stringify(foundSlab));
-  // console.log("Slice: " + JSON.stringify(foundSlice));
-  // console.log("Wall: " + JSON.stringify(foundWall));
-
 }
-
-/*
-function searchArray(arrayList, value) {
-  for (var i = 0; i <= arrayList.length - 1; i++) {
-    var flatArray = Array.prototype.concat.apply([], arrayList[i].Matrix);
-    console.log(flatArray);
-
-    // could this be filter?
-    var possibleValue = flatArray.find(function(element) {return element[0] == value});
-    console.log("Possible Value: " + possibleValue + " found in: " + arrayList[i]);
-    if (possibleValue == null || possibleValue == undefined) {
-      continue;
-      // console.log(foundArray);
-    };
-  }
-  console.log(arrayList[i].id);
-  return arrayList[i].id;
-
-}
-*/
 
 // this is not good
 function searchAndRemoveFromArray(arrayList, value, foundNumber) {
@@ -241,6 +215,7 @@ function reduceSuperPosition(array, num) {
   }
 }
 
+// NOT WORKING, RETURNING VALID WHEN IT'S NOT
 function checkValidity(cube) {
   /*
   1. check if any face, slab, slice, or wall has either:
@@ -278,7 +253,7 @@ function foundDuplicatesOrBlanks(array, count) {
 function displayFaces(face, id) {
   var html = "<table style='table-layout: fixed; width: 350px; background-color:" + face.color + ";' border='1|1'>";
   for (var i = 0; i <= 3; i++) {
-    html+="<tr>";
+    html+="<tr height='85px'>";
     for (var j = 0; j <= 3; j++) {
     html+="<td style='word-wrap: break-word'>"+ face.Matrix[i][j][1] +"</td>";
     }
@@ -289,7 +264,7 @@ document.getElementById(id).innerHTML = html;
 }
 
 function displayArray(face, id) {
-  var html = "<table style='table-layout: fixed; width: 350px;' border='1|1'>";
+  var html = "<table style='table-layout: fixed; width: 1400px;' border='1|1'>";
   html+="<tr>";
   for (var i = 0; i <= 3; i++) {
     for (var j = 0; j <= 3; j++) {
@@ -338,7 +313,7 @@ function displayRest(cube) {
 
 function displayAll(cube) {
   displayAllFaces(cube);
-  //displayRest(cube);
+  displayRest(cube);
 }
 
 
