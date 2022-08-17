@@ -175,18 +175,35 @@ function waveformCollapse(cube) {
   // console.log(lists[0])
   var randomValue = lists[0].sample();// getLowestEntropy(lists[0]);
   var randomNumber = randomValue[1].sample();
+  cube.newestNumber = [randomValue[0], randomNumber];
 
   removeAll(cube, randomValue, randomNumber, "Removed");
-  var newLists = getChoiceAndSingleList(cube)
-  if (newLists[1].length > lists[1].length + 1) {
-    var differences = newLists[1].filter(x => !lists[1].includes(x));
-    differences.forEach(num => removeAll(cube, num[0], num[1], "Auto-Removal"));
-  }
+
+  smartCleanUp(cube, lists);
+  dumbCleanUp(cube);
   checkValidity(cube);
   if (cube.valid == false) {
     cube.invalid = randomValue;
   }
 
+}
+
+function smartCleanUp(cube, lists) {
+    var newLists = getChoiceAndSingleList(cube);
+  if (newLists[1].length > lists[1].length + 1) {
+    var differences = newLists[1].filter(x => !lists[1].includes(x));
+    differences.forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
+  }
+}
+
+// I think I need to add some info to single each record, whether it's been FILLED or not
+// This is still messing up for chained singles
+function dumbCleanUp(cube) {
+    var newLists = getChoiceAndSingleList(cube);
+    //console.log(newLists[1]);
+    singles = newLists[1].length;
+    console.log(singles);
+    newLists[1].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
 }
 
 function getLowestEntropy(array) {
@@ -308,11 +325,11 @@ function foundDuplicatesOrBlanks(array, count) {
 }
 
 function displayFaces(cube, face, id) {
-  var html = "<table style='table-layout: fixed; width: 350px; background-color:" + face.color + ";' border='1|1'>";
+  var html = "<table style='table-layout: fixed; width: 300px; background-color:" + face.color + ";' border='1|1'>";
   for (var i = 0; i <= 3; i++) {
-    html+="<tr height='85px'>";
+    html+="<tr height='70px'>";
     for (var j = 0; j <= 3; j++) {
-      var font = face.Matrix[i][j][1].length == 1 ? "font-size:50px; text-align: center;" : "";
+      var font = face.Matrix[i][j][1].length == 1 ? "font-size:50px; text-align: center;" : "font-size:10px; text-align: center;";
       var textColor = face.Matrix[i][j][0] == cube.invalid[0] ? "color:red;" : "";
     html+="<td style='word-wrap: break-word; " + font + textColor + "'>"+ face.Matrix[i][j][1] +"</td>";
     }
@@ -323,7 +340,7 @@ document.getElementById(id).innerHTML = html;
 }
 
 function displayArray(face, id) {
-  var html = "<table style='table-layout: fixed; width: 1400px;' border='1|1'>";
+  var html = "<table style='table-layout: fixed; width: 1200px;' border='1|1'>";
   html+="<tr>";
   for (var i = 0; i <= 3; i++) {
     for (var j = 0; j <= 3; j++) {
@@ -400,7 +417,8 @@ function setupNewCube(cube) {
     walls: createWalls(4),
     valid: true,
     complete: false,
-    invalid: [""]
+    invalid: [""],
+    newestNumber: ['', '']
   };
   assignPositionalIds(cube.faces);
   setFaceColors(cube);
