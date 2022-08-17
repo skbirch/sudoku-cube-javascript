@@ -14,7 +14,7 @@
   <div id= "3"></div>
 </div>
 <div id= "5"></div>
-<h2>Slabs</h2>
+<!-- <h2>Slabs</h2>
 <div id= "6"></div>
 <div id= "7"></div>
 <div id= "8"></div>
@@ -29,10 +29,12 @@
 <div id= "15"></div>
 <div id= "16"></div>
 <div id= "17"></div>
+-->
   <script>
     // Create cube and empty vars
     var validCubeList = []
-    var maxCount = 0;
+    var bestCount = 0;
+    var manualLoop = true;
     /*
     let bestCube = {
         faces: createFaces(6),
@@ -46,8 +48,8 @@
     setFaceColors(bestCube)
     syncAll(bestCube.faces, bestCube.slabs, bestCube.slices, bestCube.walls);
     */
-    var bestCube = null;
-    for (var i = 0; i <= 400; i++) {
+    let bestCube = null;
+    // for (var i = 0; i <= 400; i++) {
       
       let cube = {
         faces: createFaces(6),
@@ -68,24 +70,26 @@
       var count = 0;
 
       // Loop while valid and incomplete
-      while (cube.valid == true && cube.complete == false) { 
-        waveformCollapse(cube);
-        displayAll(cube);
-        checkValidity(cube);
-      // Keep tabs on closest success
-        count += 1;
-        if (cube.valid == true && count >= maxCount) {bestCube = cube; maxCount = count;}
+      // loopWhileValid(cube, bestCube, count, bestCount)
+      
+      //Key press for manual running
+      window.onkeypress = function(event) {
+        if (event.keyCode == 13) {
+          count = collapseAndCheck(cube, bestCube, count, bestCount);
+        }
       }
-      console.log(maxCount);
+
+      //log best count reached
+      console.log(bestCount);
 
       // Ping and log success 
       if (cube.complete == true) {
         console.log("We Got One!!!")
         validCubeList.push(cube);        
       }
-    }
+    // }
     // Show Best Cube
-    cube = bestCube;
+    // cube = bestCube;
     displayAll(cube);
     console.log(validCubeList);
   </script>

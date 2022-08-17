@@ -165,25 +165,48 @@ function waveformCollapse(cube) {
   -- 1. get a face
   -- 2. choose a random array point that has length > 1
   -- 3. fill with random number chosen from cell options
-  4. get face, slab, slice, and wall with that id, remove number from all arrays > 1.
+  -- 4. get face, slab, slice, and wall with that id, remove number from all arrays > 1.
+  -- 5. repeat for any new singletons
   */
+
+  var lists = getChoiceAndSingleList(cube);
+
+  // console.log(choiceList);
+  var randomValue = lists[0].sample();
+  var foundNumber = randomValue[1].sample();
+  removeAll(cube, randomValue, randomNumber);
+  var newLists = getChoiceAndSingleList(cube)
+  if (newLists[1].length > lists[1].length + 1) {
+    var differences = newLists[1].filter(x => !lists[1].includes(x));
+    differences.forEach(num => removeAll(cube, num[0], num[1]));
+  }
+
+}
+
+function getChoiceAndSingleList(cube) {
   var choiceList = [];
+  var singleList = [];
   for (var i = 0; i <= 5; i++) {
     for (var j = 0; j <= 3; j++) {
       for (var k = 0; k <= 3; k++) {
         if (cube.faces[i].Matrix[j][k][1].length > 1) {
           choiceList.push(cube.faces[i].Matrix[j][k]);
         }
+        else {
+          singleList.push(cube.faces[i].Matrix[j][k]);
+        }
       }
     }
   }
-  // console.log(choiceList);
-  var randomValue = choiceList.sample();
-  var foundNumber = randomValue[1].sample();
-  var foundFace = searchAndRemoveFromArray(cube.faces, randomValue, foundNumber);
-  var foundSlab = searchAndRemoveFromArray(cube.slabs, randomValue, foundNumber);
-  var foundSlice = searchAndRemoveFromArray(cube.slices, randomValue, foundNumber);
-  var foundWall = searchAndRemoveFromArray(cube.walls, randomValue, foundNumber);
+
+  return [choiceList, singleList];
+}
+
+function removeAll(cube, value) {
+  searchAndRemoveFromArray(cube.faces, randomValue, foundNumber);
+  searchAndRemoveFromArray(cube.slabs, randomValue, foundNumber);
+  searchAndRemoveFromArray(cube.slices, randomValue, foundNumber);
+  searchAndRemoveFromArray(cube.walls, randomValue, foundNumber);
 }
 
 // this is not good
@@ -198,7 +221,7 @@ function searchAndRemoveFromArray(arrayList, value, foundNumber) {
           arrayList[i].Matrix[j][k][1] = [foundNumber];// arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber);
 
           // console.log(arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber));
-          return arrayList[i].id;
+          // return arrayList[i].id;
         }
       }
     }
@@ -241,6 +264,7 @@ function foundDuplicatesOrBlanks(array, count) {
         }
         if (array[i].Matrix[j][k][1].length == 1) {
           singleList.push(array[i].Matrix[j][k][1][0]);
+
         }
       }
     }
@@ -255,7 +279,8 @@ function displayFaces(face, id) {
   for (var i = 0; i <= 3; i++) {
     html+="<tr height='85px'>";
     for (var j = 0; j <= 3; j++) {
-    html+="<td style='word-wrap: break-word'>"+ face.Matrix[i][j][1] +"</td>";
+      var font = face.Matrix[i][j][1].length == 1 ? "font-size:50px; text-align: center" : "";
+    html+="<td style='word-wrap: break-word; " + font + "'>"+ face.Matrix[i][j][1] +"</td>";
     }
     html+="</tr>";
   }
@@ -273,7 +298,7 @@ function displayArray(face, id) {
   }
   html+="</tr>";
   html+="</table>";
-document.getElementById(id).innerHTML = html;
+  document.getElementById(id).innerHTML = html;
 }
 
 function setFaceColors(cube) {
@@ -293,7 +318,7 @@ function displayAllFaces(cube) {
   displayFaces(cube.faces[4], "4");
   displayFaces(cube.faces[5], "5");
 }
-
+/*
 function displayRest(cube) {
   displayArray(cube.slabs[0], "6");
   displayArray(cube.slabs[1], "7");
@@ -310,14 +335,29 @@ function displayRest(cube) {
   displayArray(cube.walls[2], "16");
   displayArray(cube.walls[3], "17");
 }
-
+*/
 function displayAll(cube) {
   displayAllFaces(cube);
-  displayRest(cube);
+  //displayRest(cube);
 }
 
+function collapseAndCheck(cube, bestCube, count, bestCount) {
+  if (cube.valid == true && cube.complete == false) {
+    waveformCollapse(cube);
+    displayAll(cube);
+    checkValidity(cube);
+    if (cube.valid == true && count >= bestCount) {bestCube = cube; bestCount = count;}
+  }
+}
 
-
+function loopWhileValid(cube, bestCube, count, bestCount) {
+  // while (cube.valid == true && cube.complete == false) { 
+  collapseAndCheck(cube);
+  // Keep tabs on closest success
+  count += 1;
+  if (cube.valid == true && count >= bestCount) {bestCube = cube; bestCount = count;}
+  // }
+}
 
 
 
