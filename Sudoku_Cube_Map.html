@@ -35,62 +35,57 @@
     var validCubeList = []
     var bestCount = 0;
     var manualLoop = true;
-    /*
-    let bestCube = {
-        faces: createFaces(6),
-        slabs: createSlabs(4),
-        slices: createSlices(4),
-        walls: createWalls(4),
-        valid: true,
-        complete: false
-      };
-    assignPositionalIds(bestCube.faces);
-    setFaceColors(bestCube)
-    syncAll(bestCube.faces, bestCube.slabs, bestCube.slices, bestCube.walls);
-    */
-    let bestCube = null;
-    // for (var i = 0; i <= 400; i++) {
-      
-      let cube = {
-        faces: createFaces(6),
-        slabs: createSlabs(4),
-        slices: createSlices(4),
-        walls: createWalls(4),
-        valid: true,
-        complete: false
-      };
+    var takeBest = false;
 
-      //Setup
-      assignPositionalIds(cube.faces);
-      setFaceColors(cube)
-      syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
-      
-      // let cube = Object.assign({}, bestCube);
-      displayAll(cube);
-      var count = 0;
+    let bestCube = setupNewCube();   
 
-      // Loop while valid and incomplete
-      // loopWhileValid(cube, bestCube, count, bestCount)
-      
-      //Key press for manual running
-      window.onkeypress = function(event) {
-        if (event.keyCode == 13) {
-          count = collapseAndCheck(cube, bestCube, count, bestCount);
+    // AUTOMATED RUN
+    if (manualLoop == false) {
+      let autoCube = null;
+      for (var i = 0; i <= 400; i++) {
+
+        //Set to best or new cube
+        if (takeBest == true) {
+          autoCube = Object.assign({}, bestCube);
+        }
+        else {
+          autoCube = setupNewCube(); 
+        }
+
+        // Loop while valid and incomplete
+        loopWhileValid(autoCube, bestCube, bestCount)
+        
+        //log best count reached
+        console.log(bestCount);
+
+        // Ping and log success 
+        if (autoCube.complete == true) {
+          console.log("We Got One!!!")
+          validCubeList.push(autoCube);        
         }
       }
 
-      //log best count reached
-      console.log(bestCount);
+      // Show Best autoCube
+      displayAll(bestCube);
+      console.log(autoCube);
+      console.log(validCubeList);
+    }
 
-      // Ping and log success 
-      if (cube.complete == true) {
-        console.log("We Got One!!!")
-        validCubeList.push(cube);        
+    // MANUAL RUN
+    else {
+      let manualCube = setupNewCube();
+
+            //Key press for manual running
+      window.onkeypress = function(event) {
+        if (event.keyCode == 13) {
+          if (manualCube.complete == true) {validCubeList.push(manualCube);}
+          else if (manualCube.valid == true) {collapseAndCheck(manualCube);}
+          else {manualCube = setupNewCube();}
+        }
       }
-    // }
-    // Show Best Cube
-    // cube = bestCube;
-    displayAll(cube);
-    console.log(validCubeList);
+      displayAll(manualCube);
+      console.log(manualCube);
+      console.log(validCubeList);
+    }
   </script>
 </html>

@@ -171,16 +171,48 @@ function waveformCollapse(cube) {
 
   var lists = getChoiceAndSingleList(cube);
 
-  // console.log(choiceList);
-  var randomValue = lists[0].sample();
-  var foundNumber = randomValue[1].sample();
-  removeAll(cube, randomValue, randomNumber);
+  // var randomValue = lists[0].sample();
+  // console.log(lists[0])
+  var randomValue = getLowestEntropy(lists[0]);
+  var randomNumber = randomValue[1].sample();
+
+  removeAll(cube, randomValue, randomNumber, "Removed");
   var newLists = getChoiceAndSingleList(cube)
   if (newLists[1].length > lists[1].length + 1) {
     var differences = newLists[1].filter(x => !lists[1].includes(x));
-    differences.forEach(num => removeAll(cube, num[0], num[1]));
+    differences.forEach(num => removeAll(cube, num[0], num[1], "Auto-Removal"));
+  }
+  checkValidity(cube);
+  if (cube.valid == false) {
+    cube.invalid = randomValue;
   }
 
+}
+
+function getLowestEntropy(array) {
+  var sortedArray = array.sort(function(a,b){
+    if(a[1].length > b[1].length) return 1;
+    if(a[1].length < b[1].length) return -1;
+    return 0;
+  });
+  var minLength = sortedArray[0][1].length;
+  var filteredArray = sortedArray.filter(function(a){return a[1].length = minLength;})
+  return filteredArray.sample();
+    /*
+  shortestLength = 17;
+  shortestArrays = [];
+  for (var i = 0; i <= array.length - 1; i++) {
+    console.log(array[i][1].length);
+    if (array[i][1].length < shortestLength) {
+      shortestArrays = [array[i]];
+    }
+    else if (array[i][1] == shortestLength) {
+      shortestArrays.push(array[i]);
+    }
+    console.log(shortestArrays);
+  }
+  return shortestArrays.sample();
+*/
 }
 
 function getChoiceAndSingleList(cube) {
@@ -202,11 +234,13 @@ function getChoiceAndSingleList(cube) {
   return [choiceList, singleList];
 }
 
-function removeAll(cube, value) {
-  searchAndRemoveFromArray(cube.faces, randomValue, foundNumber);
-  searchAndRemoveFromArray(cube.slabs, randomValue, foundNumber);
-  searchAndRemoveFromArray(cube.slices, randomValue, foundNumber);
-  searchAndRemoveFromArray(cube.walls, randomValue, foundNumber);
+function removeAll(cube, value, number, message) {
+  searchAndRemoveFromArray(cube.faces, value, number);
+  searchAndRemoveFromArray(cube.slabs, value, number);
+  searchAndRemoveFromArray(cube.slices, value, number);
+  searchAndRemoveFromArray(cube.walls, value, number);
+  // console.log(message);
+
 }
 
 // this is not good
@@ -238,7 +272,6 @@ function reduceSuperPosition(array, num) {
   }
 }
 
-// NOT WORKING, RETURNING VALID WHEN IT'S NOT
 function checkValidity(cube) {
   /*
   1. check if any face, slab, slice, or wall has either:
@@ -274,13 +307,14 @@ function foundDuplicatesOrBlanks(array, count) {
   }
 }
 
-function displayFaces(face, id) {
+function displayFaces(cube, face, id) {
   var html = "<table style='table-layout: fixed; width: 350px; background-color:" + face.color + ";' border='1|1'>";
   for (var i = 0; i <= 3; i++) {
     html+="<tr height='85px'>";
     for (var j = 0; j <= 3; j++) {
-      var font = face.Matrix[i][j][1].length == 1 ? "font-size:50px; text-align: center" : "";
-    html+="<td style='word-wrap: break-word; " + font + "'>"+ face.Matrix[i][j][1] +"</td>";
+      var font = face.Matrix[i][j][1].length == 1 ? "font-size:50px; text-align: center;" : "";
+      var textColor = face.Matrix[i][j][0] == cube.invalid[0] ? "color:red;" : "";
+    html+="<td style='word-wrap: break-word; " + font + textColor + "'>"+ face.Matrix[i][j][1] +"</td>";
     }
     html+="</tr>";
   }
@@ -303,20 +337,20 @@ function displayArray(face, id) {
 
 function setFaceColors(cube) {
   cube.faces[0].color = "white";
-  cube.faces[1].color = "red";
-  cube.faces[2].color = "yellow";
-  cube.faces[3].color = "orange";
-  cube.faces[4].color = "blue";
-  cube.faces[5].color = "green";
+  cube.faces[1].color = "pink";
+  cube.faces[2].color = "lightyellow";
+  cube.faces[3].color = "Moccasin";
+  cube.faces[4].color = "lightblue";
+  cube.faces[5].color = "lightgreen";
 }
 
 function displayAllFaces(cube) {
-  displayFaces(cube.faces[0], "0");
-  displayFaces(cube.faces[1], "1");
-  displayFaces(cube.faces[2], "2");
-  displayFaces(cube.faces[3], "3");
-  displayFaces(cube.faces[4], "4");
-  displayFaces(cube.faces[5], "5");
+  displayFaces(cube, cube.faces[0], "0");
+  displayFaces(cube, cube.faces[1], "1");
+  displayFaces(cube, cube.faces[2], "2");
+  displayFaces(cube, cube.faces[3], "3");
+  displayFaces(cube, cube.faces[4], "4");
+  displayFaces(cube, cube.faces[5], "5");
 }
 /*
 function displayRest(cube) {
@@ -341,23 +375,37 @@ function displayAll(cube) {
   //displayRest(cube);
 }
 
-function collapseAndCheck(cube, bestCube, count, bestCount) {
+function collapseAndCheck(cube) {
   if (cube.valid == true && cube.complete == false) {
     waveformCollapse(cube);
     displayAll(cube);
-    checkValidity(cube);
-    if (cube.valid == true && count >= bestCount) {bestCube = cube; bestCount = count;}
   }
 }
 
-function loopWhileValid(cube, bestCube, count, bestCount) {
-  // while (cube.valid == true && cube.complete == false) { 
+function loopWhileValid(cube, bestCube, bestCount) {
+  count = 0;
+  while (cube.valid == true && cube.complete == false) {
+    if (count >= bestCount) {  bestCube = Object.assign({}, cube); bestCount = count;}
   collapseAndCheck(cube);
-  // Keep tabs on closest success
   count += 1;
-  if (cube.valid == true && count >= bestCount) {bestCube = cube; bestCount = count;}
-  // }
+  // console.log(count);
+  }
 }
 
-
+function setupNewCube(cube) {
+  var cube = {
+    faces: createFaces(6),
+    slabs: createSlabs(4),
+    slices: createSlices(4),
+    walls: createWalls(4),
+    valid: true,
+    complete: false,
+    invalid: [""]
+  };
+  assignPositionalIds(cube.faces);
+  setFaceColors(cube);
+  syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
+  displayAll(cube);
+  return cube;
+}
 
