@@ -173,7 +173,7 @@ function waveformCollapse(cube) {
 
   // var randomValue = lists[0].sample();
   // console.log(lists[0])
-  var randomValue = getLowestEntropy(lists[0]);
+  var randomValue = lists[0].sample();// getLowestEntropy(lists[0]);
   var randomNumber = randomValue[1].sample();
 
   removeAll(cube, randomValue, randomNumber, "Removed");
