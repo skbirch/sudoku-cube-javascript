@@ -201,13 +201,15 @@ function smartCleanUp(cube, lists) {
 function dumbCleanUp(cube) {
     var newLists = getLists(cube);
     var newUnset = (newLists[2].length === undefined) ? 0 : newLists[2].length;
+    newLists[1].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
     // console.log(newUnset);
     while (newUnset >= 1) {
-      console.log("Dumb Clean Up!")
+      console.log("Unset Dumb Clean Up!")
       newLists[2].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
       newLists = getLists(cube);
       newUnset = (newLists[2].length === undefined) ? 0 : newLists[2].length;
     }
+
 }
 
 function getLowestEntropy(array) {
@@ -404,7 +406,7 @@ function loopWhileValid(cube, bestCube, bestCount) {
   }
 }
 
-function setupNewCube(cube) {
+function setupNewCube() {
   var cube = {
     faces: createFaces(6),
     slabs: createSlabs(4),
@@ -422,3 +424,6 @@ function setupNewCube(cube) {
   return cube;
 }
 
+function unlinkedCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}

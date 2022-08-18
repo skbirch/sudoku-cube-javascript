@@ -35,7 +35,8 @@
     var manualLoop = true;
     var takeBest = false;
 
-    let bestCube = setupNewCube();   
+    let bestCube = setupNewCube();
+    let undoCubeList = [];
 
     // AUTOMATED RUN
     if (manualLoop == false) {
@@ -71,18 +72,34 @@
 
     // MANUAL RUN
     else {
-      let manualCube = setupNewCube();
+      var manualCube = setupNewCube();
 
             //Key press for manual running
-      window.onkeypress = function(event) {
+      window.onkeydown = function(event) {
         if (event.keyCode == 13) {
           if (manualCube.complete == true) {
-            validCubeList.push(manualCube);
+            validCubeList.push(unlinkedCopy(manualCube));
           }
-          else if (manualCube.valid == true) {collapseAndCheck(manualCube);}
-          else {manualCube = setupNewCube();}
+          else if (manualCube.valid == true) {
+            undoCubeList.push(unlinkedCopy(manualCube));
+            collapseAndCheck(manualCube);
+          }
         }
+        if (event.keyCode == 8) {
+          event.preventDefault();
+          manualCube = unlinkedCopy(undoCubeList.pop());
+          dumbCleanUp(manualCube);
+          checkValidity(manualCube);
+          displayAll(manualCube);
+        }
+        if (event.keyCode == 32) {
+          {manualCube = setupNewCube();
+          undoCubeList = [];
+          }
+        }
+
       }
+
       displayAll(manualCube);
       console.log(manualCube);
       console.log(validCubeList);
