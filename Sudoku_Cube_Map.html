@@ -35,44 +35,11 @@
     var manualLoop = true;
     var takeBest = false;
 
-    let bestCube = setupNewCube();
     let undoCubeList = [];
 
-    // AUTOMATED RUN
-    if (manualLoop == false) {
-      let autoCube = null;
-      for (var i = 0; i <= 400; i++) {
-
-        //Set to best or new cube
-        if (takeBest == true) {
-          autoCube = Object.assign({}, bestCube);
-        }
-        else {
-          autoCube = setupNewCube(); 
-        }
-
-        // Loop while valid and incomplete
-        loopWhileValid(autoCube, bestCube, bestCount)
-        
-        //log best count reached
-        console.log(bestCount);
-
-        // Ping and log success 
-        if (autoCube.complete == true) {
-          console.log("We Got One!!!")
-          validCubeList.push(autoCube);        
-        }
-      }
-
-      // Show Best autoCube
-      displayAll(bestCube);
-      console.log(autoCube);
-      console.log(validCubeList);
-    }
 
     // MANUAL RUN
-    else {
-      var manualCube = setupNewCube();
+      let manualCube = setupNewCube();
 
             //Key press for manual running
       window.onkeydown = function(event) {
@@ -97,8 +64,6 @@
           undoCubeList = [];
           }
         }
-
-      }
 
       displayAll(manualCube);
       console.log(manualCube);
