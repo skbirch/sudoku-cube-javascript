@@ -175,7 +175,7 @@ function waveformCollapse(cube) {
   // console.log(lists[0])
   var randomValue = lists[0].sample();// getLowestEntropy(lists[0]);
   var randomNumber = randomValue[1].sample();
-  cube.newestNumber = [randomValue[0], randomNumber];
+  cube.newestNumber = [randomValue[0], randomNumber, "set"];
 
   removeAll(cube, randomValue, randomNumber, "Removed");
 
@@ -201,7 +201,8 @@ function smartCleanUp(cube, lists) {
 function dumbCleanUp(cube) {
     var newLists = getLists(cube);
     var newUnset = (newLists[2].length === undefined) ? 0 : newLists[2].length;
-    while (newUnset.length > 1) {
+    // console.log(newUnset);
+    while (newUnset >= 1) {
       console.log("Dumb Clean Up!")
       newLists[2].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
       newLists = getLists(cube);
@@ -211,28 +212,13 @@ function dumbCleanUp(cube) {
 
 function getLowestEntropy(array) {
   var sortedArray = array.sort(function(a,b){
-    if(a[1].length > b[1].length) return 1;
-    if(a[1].length < b[1].length) return -1;
+    if(a.length > b.length) return 1;
+    if(a.length < b.length) return -1;
     return 0;
   });
   var minLength = sortedArray[0][1].length;
   var filteredArray = sortedArray.filter(function(a){return a[1].length = minLength;})
   return filteredArray.sample();
-    /*
-  shortestLength = 17;
-  shortestArrays = [];
-  for (var i = 0; i <= array.length - 1; i++) {
-    console.log(array[i][1].length);
-    if (array[i][1].length < shortestLength) {
-      shortestArrays = [array[i]];
-    }
-    else if (array[i][1] == shortestLength) {
-      shortestArrays.push(array[i]);
-    }
-    console.log(shortestArrays);
-  }
-  return shortestArrays.sample();
-*/
 }
 
 function getLists(cube) {
@@ -252,6 +238,7 @@ function getLists(cube) {
           unsetList.push(cube.faces[i].Matrix[j][k]);
         }
       }
+      // console.log(unsetList);
     }
   }
 
@@ -297,16 +284,15 @@ function reduceSuperPosition(array, num) {
 }
 
 function checkValidity(cube) {
-  /*
-  1. check if any face, slab, slice, or wall has either:
-    - blank cell
-    - multiple of same number
-  */
   if (foundDuplicatesOrBlanks(cube.faces, 6) ||
       foundDuplicatesOrBlanks(cube.slabs, 4) ||
       foundDuplicatesOrBlanks(cube.slices, 4) ||
       foundDuplicatesOrBlanks(cube.walls, 4)) {
     cube.valid = false;
+  }
+  if (getLists(cube)[1].length == 96 && cube.valid == true) {
+    cube.complete = true;
+    console.log("We Got One!!!")
   }
 }
 
@@ -336,8 +322,10 @@ function displayFaces(cube, face, id) {
   for (var i = 0; i <= 3; i++) {
     html+="<tr height='70px'>";
     for (var j = 0; j <= 3; j++) {
-      var font = face.Matrix[i][j][1].length == 1 ? "font-size:50px; text-align: center;" : "font-size:10px; text-align: center;";
-      var textColor = face.Matrix[i][j][0] == cube.invalid[0] ? "color:red;" : "";
+      var size = (face.Matrix[i][j][0] == cube.newestNumber[0] || (face.Matrix[i][j][2] == "unset" && face.Matrix[i][j][1].length == 1)) ? 50 : 30;
+      var color = face.Matrix[i][j][0] == cube.newestNumber[0] ? "green" : (face.Matrix[i][j][2] == "unset" && face.Matrix[i][j][1].length == 1) ? "orange" : "black"
+      var font = face.Matrix[i][j][1].length == 1 ? "font-size:" + size + "px; text-align: center;" : "font-size:10px; text-align: center;";
+      var textColor = face.Matrix[i][j][0] == cube.invalid[0] ? "color:red;" : "color:" + color;
     html+="<td style='word-wrap: break-word; " + font + textColor + "'>"+ face.Matrix[i][j][1] +"</td>";
     }
     html+="</tr>";

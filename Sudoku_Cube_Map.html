@@ -76,7 +76,9 @@
             //Key press for manual running
       window.onkeypress = function(event) {
         if (event.keyCode == 13) {
-          if (manualCube.complete == true) {validCubeList.push(manualCube);}
+          if (manualCube.complete == true) {
+            validCubeList.push(manualCube);
+          }
           else if (manualCube.valid == true) {collapseAndCheck(manualCube);}
           else {manualCube = setupNewCube();}
         }
