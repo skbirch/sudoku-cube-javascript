@@ -49,7 +49,7 @@ function assignPositionalIds(faces) {
   for (var i = 0; i <= 5; i++) {
     for (var j = 0; j <= 3; j++) {
       for (var k = 0; k <= 3; k++) {
-        faces[i].Matrix[j][k] = ["id" + id, faces[i].Matrix[j][k]];
+        faces[i].Matrix[j][k] = ["id" + id, faces[i].Matrix[j][k], "unset"];
         id++;
       }
     }
@@ -169,7 +169,7 @@ function waveformCollapse(cube) {
   -- 5. repeat for any new singletons
   */
 
-  var lists = getChoiceAndSingleList(cube);
+  var lists = getLists(cube);
 
   // var randomValue = lists[0].sample();
   // console.log(lists[0])
@@ -179,7 +179,7 @@ function waveformCollapse(cube) {
 
   removeAll(cube, randomValue, randomNumber, "Removed");
 
-  smartCleanUp(cube, lists);
+  // smartCleanUp(cube, lists);
   dumbCleanUp(cube);
   checkValidity(cube);
   if (cube.valid == false) {
@@ -189,7 +189,7 @@ function waveformCollapse(cube) {
 }
 
 function smartCleanUp(cube, lists) {
-    var newLists = getChoiceAndSingleList(cube);
+    var newLists = getLists(cube);
   if (newLists[1].length > lists[1].length + 1) {
     var differences = newLists[1].filter(x => !lists[1].includes(x));
     differences.forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
@@ -199,11 +199,14 @@ function smartCleanUp(cube, lists) {
 // I think I need to add some info to single each record, whether it's been FILLED or not
 // This is still messing up for chained singles
 function dumbCleanUp(cube) {
-    var newLists = getChoiceAndSingleList(cube);
-    //console.log(newLists[1]);
-    singles = newLists[1].length;
-    console.log(singles);
-    newLists[1].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
+    var newLists = getLists(cube);
+    var newUnset = (newLists[2].length === undefined) ? 0 : newLists[2].length;
+    while (newUnset.length > 1) {
+      console.log("Dumb Clean Up!")
+      newLists[2].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
+      newLists = getLists(cube);
+      newUnset = (newLists[2].length === undefined) ? 0 : newLists[2].length;
+    }
 }
 
 function getLowestEntropy(array) {
@@ -232,23 +235,27 @@ function getLowestEntropy(array) {
 */
 }
 
-function getChoiceAndSingleList(cube) {
+function getLists(cube) {
   var choiceList = [];
   var singleList = [];
+  var unsetList = [];
   for (var i = 0; i <= 5; i++) {
     for (var j = 0; j <= 3; j++) {
       for (var k = 0; k <= 3; k++) {
         if (cube.faces[i].Matrix[j][k][1].length > 1) {
           choiceList.push(cube.faces[i].Matrix[j][k]);
         }
-        else {
+        else if (cube.faces[i].Matrix[j][k][2] == "set") {
           singleList.push(cube.faces[i].Matrix[j][k]);
+        }
+        else if (cube.faces[i].Matrix[j][k][2] == "unset") {
+          unsetList.push(cube.faces[i].Matrix[j][k]);
         }
       }
     }
   }
 
-  return [choiceList, singleList];
+  return [choiceList, singleList, unsetList];
 }
 
 function removeAll(cube, value, number, message) {
@@ -270,7 +277,7 @@ function searchAndRemoveFromArray(arrayList, value, foundNumber) {
           reduceSuperPosition(arrayList[i], foundNumber);
           // console.log(arrayList[i]);
           arrayList[i].Matrix[j][k][1] = [foundNumber];// arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber);
-
+          arrayList[i].Matrix[j][k][2] = "set";
           // console.log(arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber));
           // return arrayList[i].id;
         }
