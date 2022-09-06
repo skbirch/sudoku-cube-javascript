@@ -427,27 +427,3 @@ function setupNewCube() {
 function unlinkedCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
-
-function initializeUnwrappedCanvasCube() {
-  for (var i = 0; i <= 5; i++) {
-    document.getElementById(i).innerHTML = initializeUnwrappedCanvasFace(i);
-  }
-}
-
-function initializeUnwrappedCanvasFace(faceId) {
-  var html = "";
-  for (var i = 0; i <= 15; i++) {
-    var id = faceId + "-" + i;
-    html += "<div id=\"" + id + "\"class=\"cell\">" + initializeUnwrappedCanvasCell(id) + "</div>"
-  }
-  return html;
-}
-
-function initializeUnwrappedCanvasCell(cellId) {
-  var html = "";
-  for (var i = 0; i <= 15; i++) {
-    var id = cellId + "-" + i;
-    html += "<div id=\"" + id + "\"class=\"cell-row\">" + i + "</div>"
-  }
-  return html;
-}
