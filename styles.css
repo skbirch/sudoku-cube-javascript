@@ -4,6 +4,7 @@ div {
   border: 2px solid black;
   padding: 10px;
   border-radius: 10px;
+  font-family: "Copperplate", sans-serif;
 }
 .cube {
   grid-auto-rows: 32%;
@@ -14,11 +15,13 @@ div {
 }
 .face {
   aspect-ratio: 1/1;
-  text-align: center;
   gap: 3px;
   padding: 5px;
 }
 .empty {
+  aspect-ratio: 1/1;
+  gap: 3px;
+  padding: 5px;
   border: 0px transparent;
 }
 .cell {
@@ -30,6 +33,7 @@ border: 1px solid grey;
 padding: 0px;
 border-radius: 3px;
 font-size: 60%;
+text-align: center;
 }
 .white {
   background-color: white;
@@ -48,4 +52,38 @@ font-size: 60%;
 }
 .yellow {
   background-color: lightyellow;
+}
+
+.invisible {
+  border: 0px transparent;
+}
+
+.filled {
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+  font-size: 200%;
+}
+
+.invalid {
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+  font-size: 250%;
+  font-weight: bold;
+  color: firebrick;
+  background-color: indianred;
+}
+
+.new {
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+  font-size: 250%;
+  font-weight: bold;
+  color: limegreen;
+}
+
+.completed {
+  background-color: palegreen;
 }

@@ -1,8 +1,15 @@
 // Object Definition //
 // Create Face template
-function Face() {
-  this.id = null;
-  this.color = null;
+function newCube() {
+  this.faces = null;
+  this.slabs = null;
+  this.slices = null;
+  this.walls = null;
+  this.valid = true;
+  this.complete = false;
+  this.invalidList = null;
+  this.newestNumber = null;
+
     this.Matrix = new Array(4).fill().map(()=>Array(4).fill());
     this.PopulateMatrix = function() {
       this.Matrix.forEach(line => line.fill(Array.from(new Array(16), (x, i) => i)));
@@ -22,412 +29,26 @@ function Face() {
     }
   }
 
-// Create slab template
-function Slab() {
-  this.id = null;
-  this.color = null;
-  this.Matrix = new Array();
-}
-
-// Create slice template
-function Slice() {
-  this.id = null;
-  this.color = null;
-  this.Matrix = new Array();
-}
-
-// Create wall template
-function Wall() {
-  this.id = null;
-  this.color = null;
-  this.Matrix = new Array();
-}
-
-// Object Instantiation //
-function assignPositionalIds(faces) {
-  var id = 0;
-  for (var i = 0; i <= 5; i++) {
-    for (var j = 0; j <= 3; j++) {
-      for (var k = 0; k <= 3; k++) {
-        faces[i].Matrix[j][k] = ["id" + id, faces[i].Matrix[j][k], "unset"];
-        id++;
-      }
-    }
-  }
-}
-
-function assignIds(array) {
-  var id = 0;
-  for (var i = 0; i <= array.length - 1; i++) {
-    array[i].id = id;
-    id++;
-  }
-}
-
-function createFaces(count) {
-  var faceArray = [];
-  for (var i = 0; i <= count - 1; i++) {
-  var newFace = new Face();
-  newFace.PopulateMatrix();
-  faceArray.push(newFace);
-  }
-  assignIds(faceArray);
-  return faceArray;
-}
-
-function createSlabs(count) {
-  var slabArray = [];
-  for (var i = 0; i <= count - 1; i++) {
-  var newSlab = new Slab();
-  slabArray.push(newSlab);
-  }
-  assignIds(slabArray);
-  return slabArray;
-}
-
-function createSlices(count) {
-  var sliceArray = [];
-  for (var i = 0; i <= count - 1; i++) {
-  var newSlice = new Slice();
-  sliceArray.push(newSlice);
-  }
-  assignIds(sliceArray);
-  return sliceArray;
-}
-function createWalls(count) {
-  var wallArray = [];
-  for (var i = 0; i <= count - 1; i++) {
-  var newWall = new Wall();
-  wallArray.push(newWall);
-  }
-  assignIds(wallArray);
-  return wallArray;
-}
-
-// Sync Functions //
-function syncAll(faces, slabs, slices, walls) {
-  syncSlabs(faces, slabs);
-  syncSlices(faces, slices);
-  syncWalls(faces, walls);
-}
-
-function syncSlabs(faces, slabs) {
-  var faceList = [faces[0], faces[1], faces[2], faces[3]];
-  for (var i = 0; i <= faceList.length - 1; i++) {
-    faceList.forEach(face => slabs[i].Matrix.push(face.Matrix[i]));
-  }
-}
-
-function syncSlices(faces, slices) {
-  var face6 = Object.assign({}, faces[5]);
-  var face1 = Object.assign({}, faces[0]);
-  var face5 = Object.assign({}, faces[4]);
-  var face3 = Object.assign({}, faces[2]);
-  var faceList = [face6.RotateFaceClockwise(), face1.RotateFaceClockwise(), face5.RotateFaceClockwise(), face3.RotateFaceCounterClockwise()];
-  for (var i = 0; i <= faceList.length - 1; i++) {
-    faceList.forEach(face => slices[i].Matrix.push(face.Matrix[i]));
-  }
-}
-
-function syncWalls(faces, walls) {
-  var face5 = Object.assign({}, faces[4]);
-  var face2 = Object.assign({}, faces[1]);
-  var face6 = Object.assign({}, faces[5]);
-  var face4 = Object.assign({}, faces[3]);
-  var faceList = [face5, face2.RotateFaceCounterClockwise(), face6.RotateFaceUpsideDown(), face4.RotateFaceClockwise()];
-  for (var i = 0; i <= faceList.length - 1; i++) {
-    faceList.forEach(face => walls[i].Matrix.push(face.Matrix[i]));
-  }
-}
-
-// Action Functions //
-Array.prototype.sample = function(){
-  return this[Math.floor(Math.random()*this.length)];
-}
-
-function flatten(arr) {
-  return arr.reduce(function (flat, toFlatten) {
-    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-  }, []);
-}
-
-function populateValidCube(cube) {
-    cube.faces[0].Matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]];
-    cube.faces[1].Matrix = [[8, 5, 6, 7], [12, 9, 10, 11], [16, 13, 14, 15], [4, 1, 2, 3]];
-    cube.faces[2].Matrix = [[11, 12, 9, 10], [15, 16, 13, 14], [3, 4, 1, 2], [7, 8, 5, 6]];
-    cube.faces[3].Matrix = [[14, 15, 16, 13], [2, 3, 4, 1], [6, 7, 8, 5], [10, 11, 12, 9]];
-    cube.faces[4].Matrix = [[4, 8, 1, 5], [16, 12, 9, 13], [11, 15, 2, 6], [3, 7, 10, 14]];
-    cube.faces[5].Matrix = [[15, 11, 6, 2], [7, 3, 14, 10], [8, 4, 5, 1], [12, 16, 13, [1, 9]]];
-}
-
-function waveformCollapse(cube) {
-  /*
-  -- 1. get a face
-  -- 2. choose a random array point that has length > 1
-  -- 3. fill with random number chosen from cell options
-  -- 4. get face, slab, slice, and wall with that id, remove number from all arrays > 1.
-  -- 5. repeat for any new singletons
-  */
-
-  var lists = getLists(cube);
-
-  // var randomValue = lists[0].sample();
-  // console.log(lists[0])
-  var randomValue = lists[0].sample();// getLowestEntropy(lists[0]);
-  var randomNumber = randomValue[1].sample();
-  cube.newestNumber = [randomValue[0], randomNumber, "set"];
-
-  removeAll(cube, randomValue, randomNumber, "Removed");
-
-  // smartCleanUp(cube, lists);
-  dumbCleanUp(cube);
-  checkValidity(cube);
-  if (cube.valid == false) {
-    cube.invalid = randomValue;
-  }
-
-}
-
-function smartCleanUp(cube, lists) {
-    var newLists = getLists(cube);
-  if (newLists[1].length > lists[1].length + 1) {
-    var differences = newLists[1].filter(x => !lists[1].includes(x));
-    differences.forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
-  }
-}
-
-// I think I need to add some info to single each record, whether it's been FILLED or not
-// This is still messing up for chained singles
-function dumbCleanUp(cube) {
-    var newLists = getLists(cube);
-    var newUnset = (newLists[2].length === undefined) ? 0 : newLists[2].length;
-    newLists[1].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
-    // console.log(newUnset);
-    while (newUnset >= 1) {
-      console.log("Unset Dumb Clean Up!")
-      newLists[2].forEach(num => removeAll(cube, num, num[1][0], "Auto-Removal"));
-      newLists = getLists(cube);
-      newUnset = (newLists[2].length === undefined) ? 0 : newLists[2].length;
-    }
-
-}
-
-function getLowestEntropy(array) {
-  var sortedArray = array.sort(function(a,b){
-    if(a.length > b.length) return 1;
-    if(a.length < b.length) return -1;
-    return 0;
-  });
-  var minLength = sortedArray[0][1].length;
-  var filteredArray = sortedArray.filter(function(a){return a[1].length = minLength;})
-  return filteredArray.sample();
-}
-
-function getLists(cube) {
-  var choiceList = [];
-  var singleList = [];
-  var unsetList = [];
-  for (var i = 0; i <= 5; i++) {
-    for (var j = 0; j <= 3; j++) {
-      for (var k = 0; k <= 3; k++) {
-        if (cube.faces[i].Matrix[j][k][1].length > 1) {
-          choiceList.push(cube.faces[i].Matrix[j][k]);
-        }
-        else if (cube.faces[i].Matrix[j][k][2] == "set") {
-          singleList.push(cube.faces[i].Matrix[j][k]);
-        }
-        else if (cube.faces[i].Matrix[j][k][2] == "unset") {
-          unsetList.push(cube.faces[i].Matrix[j][k]);
-        }
-      }
-      // console.log(unsetList);
-    }
-  }
-
-  return [choiceList, singleList, unsetList];
-}
-
-function removeAll(cube, value, number, message) {
-  searchAndRemoveFromArray(cube.faces, value, number);
-  searchAndRemoveFromArray(cube.slabs, value, number);
-  searchAndRemoveFromArray(cube.slices, value, number);
-  searchAndRemoveFromArray(cube.walls, value, number);
-  // console.log(message);
-
-}
-
-// this is not good
-function searchAndRemoveFromArray(arrayList, value, foundNumber) {
-  for (var i = 0; i <= arrayList.length - 1; i++) {
-    for (var j = 0; j <= arrayList[i].Matrix.length - 1; j++) {
-      for (var k = 0; k <= arrayList[i].Matrix[j].length - 1; k++) {
-        if (arrayList[i].Matrix[j][k][0] == value[0]) {
-          // console.log(arrayList[i].Matrix[j][k][0]);
-          reduceSuperPosition(arrayList[i], foundNumber);
-          // console.log(arrayList[i]);
-          arrayList[i].Matrix[j][k][1] = [foundNumber];// arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber);
-          arrayList[i].Matrix[j][k][2] = "set";
-          // console.log(arrayList[i].Matrix[j][k][1].filter(item => item !== foundNumber));
-          // return arrayList[i].id;
-        }
-      }
-    }
-  }
-}
-
-function reduceSuperPosition(array, num) {
-  for (var i = 0; i <= 3; i++) {
-    for (var j = 0; j <= 3; j++) {
-      if (array.Matrix[i][j][1].length >1) {
-        array.Matrix[i][j][1] = array.Matrix[i][j][1].filter(item => item !== num);
-      }
-    }
-  }
-}
-
-function checkValidity(cube) {
-  if (foundDuplicatesOrBlanks(cube.faces, 6) ||
-      foundDuplicatesOrBlanks(cube.slabs, 4) ||
-      foundDuplicatesOrBlanks(cube.slices, 4) ||
-      foundDuplicatesOrBlanks(cube.walls, 4)) {
-    cube.valid = false;
-  }
-  if (getLists(cube)[1].length == 96 && cube.valid == true) {
-    cube.complete = true;
-    console.log("We Got One!!!")
-  }
-}
-
-function foundDuplicatesOrBlanks(array, count) {
-  for (var i = 0; i <= count - 1; i++) {
-    var singleList = [];
-    for (var j = 0; j <= 3; j++) {
-      for (var k = 0; k <= 3; k++) {
-        if (array[i].Matrix[j][k][1].length == 0) {
-          console.log("NO LENGTH");
-          return true;
-        }
-        if (array[i].Matrix[j][k][1].length == 1) {
-          singleList.push(array[i].Matrix[j][k][1][0]);
-
-        }
-      }
-    }
-    var noDups = new Set(singleList);
-    // console.log(singleList.length + " | " + noDups);
-    return singleList.length !== noDups.size;
-  }
-}
-
-function displayFaces(cube, face, id) {
-  var html = "<table style='table-layout: fixed; width: 300px; background-color:" + face.color + ";' border='1|1'>";
-  for (var i = 0; i <= 3; i++) {
-    html+="<tr height='70px'>";
-    for (var j = 0; j <= 3; j++) {
-      var size = (face.Matrix[i][j][0] == cube.newestNumber[0] || (face.Matrix[i][j][2] == "unset" && face.Matrix[i][j][1].length == 1)) ? 50 : 30;
-      var color = face.Matrix[i][j][0] == cube.newestNumber[0] ? "green" : (face.Matrix[i][j][2] == "unset" && face.Matrix[i][j][1].length == 1) ? "orange" : "black"
-      var font = face.Matrix[i][j][1].length == 1 ? "font-size:" + size + "px; text-align: center;" : "font-size:10px; text-align: center;";
-      var textColor = face.Matrix[i][j][0] == cube.invalid[0] ? "color:red;" : "color:" + color;
-    html+="<td style='word-wrap: break-word; " + font + textColor + "'>"+ face.Matrix[i][j][1] +"</td>";
-    }
-    html+="</tr>";
-  }
-  html+="</table>";
-document.getElementById(id).innerHTML = html;
-}
-
-function displayArray(face, id) {
-  var html = "<table style='table-layout: fixed; width: 1200px;' border='1|1'>";
-  html+="<tr>";
-  for (var i = 0; i <= 3; i++) {
-    for (var j = 0; j <= 3; j++) {
-    html+="<td style='word-wrap: break-word'>"+ face.Matrix[i][j][1] +"</td>";
-    }
-  }
-  html+="</tr>";
-  html+="</table>";
-  document.getElementById(id).innerHTML = html;
-}
-
-function setFaceColors(cube) {
-  cube.faces[0].color = "white";
-  cube.faces[1].color = "pink";
-  cube.faces[2].color = "lightyellow";
-  cube.faces[3].color = "Moccasin";
-  cube.faces[4].color = "lightblue";
-  cube.faces[5].color = "lightgreen";
-}
-
-function displayAllFaces(cube) {
-  displayFaces(cube, cube.faces[0], "0");
-  displayFaces(cube, cube.faces[1], "1");
-  displayFaces(cube, cube.faces[2], "2");
-  displayFaces(cube, cube.faces[3], "3");
-  displayFaces(cube, cube.faces[4], "4");
-  displayFaces(cube, cube.faces[5], "5");
-}
-/*
-function displayRest(cube) {
-  displayArray(cube.slabs[0], "6");
-  displayArray(cube.slabs[1], "7");
-  displayArray(cube.slabs[2], "8");
-  displayArray(cube.slabs[3], "9");
-
-  displayArray(cube.slices[0], "10");
-  displayArray(cube.slices[1], "11");
-  displayArray(cube.slices[2], "12");
-  displayArray(cube.slices[3], "13");
-
-  displayArray(cube.walls[0], "14");
-  displayArray(cube.walls[1], "15");
-  displayArray(cube.walls[2], "16");
-  displayArray(cube.walls[3], "17");
-}
-*/
-function displayAll(cube) {
-  displayAllFaces(cube);
-  //displayRest(cube);
-}
-
-function collapseAndCheck(cube) {
-  if (cube.valid == true && cube.complete == false) {
-    waveformCollapse(cube);
+  function setupNewCube() {
+    var cube = {
+      faces: createFaces(6),
+      slabs: createSlabs(4),
+      slices: createSlices(4),
+      walls: createWalls(4),
+      valid: true,
+      complete: false,
+      invalid: [""],
+      newestNumber: ['', '']
+    };
+    assignPositionalIds(cube.faces);
+    setFaceColors(cube);
+    syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
     displayAll(cube);
+    return cube;
   }
-}
 
-function loopWhileValid(cube, bestCube, bestCount) {
-  count = 0;
-  while (cube.valid == true && cube.complete == false) {
-    if (count >= bestCount) {  bestCube = Object.assign({}, cube); bestCount = count;}
-  collapseAndCheck(cube);
-  count += 1;
-  // console.log(count);
-  }
-}
-
-function setupNewCube() {
-  var cube = {
-    faces: createFaces(6),
-    slabs: createSlabs(4),
-    slices: createSlices(4),
-    walls: createWalls(4),
-    valid: true,
-    complete: false,
-    invalid: [""],
-    newestNumber: ['', '']
-  };
-  assignPositionalIds(cube.faces);
-  setFaceColors(cube);
-  syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
-  displayAll(cube);
-  return cube;
-}
-
-function unlinkedCopy(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
+// Visual Functions
+// -------------------------------------------------------------------------------------
 function initializeUnwrappedCanvasCube() {
   for (var i = 0; i <= 5; i++) {
     document.getElementById(i).innerHTML = initializeUnwrappedCanvasFace(i);
@@ -447,7 +68,21 @@ function initializeUnwrappedCanvasCell(cellId) {
   var html = "";
   for (var i = 0; i <= 15; i++) {
     var id = cellId + "-" + i;
-    html += "<div id=\"" + id + "\"class=\"cell-row\">" + i + "</div>"
+    html += "<div id=\"" + id + "\"class=\"cell-row\">15</div>"
   }
   return html;
 }
+
+function setCellState(id, status, value) {
+  var element = document.getElementById(id);
+  element.innerHTML = value;
+  element.classList.add(status);
+}
+
+function completedCube() {
+  var elements = document.getElementsByClassName("face");
+  for (let element of elements) {
+    element.classList.add("completed");
+  }
+}
+// -------------------------------------------------------------------------------------
