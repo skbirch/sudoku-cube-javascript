@@ -1,52 +1,86 @@
 // Object Definition //
 // Create Face template
 function newCube() {
-  this.faces = null;
-  this.slabs = null;
-  this.slices = null;
-  this.walls = null;
-  this.valid = true;
-  this.complete = false;
-  this.invalidList = null;
-  this.newestNumber = null;
+  var cube = new Object();
+  cube.faces = newFaces(6);
+  cube.slabs = newSections(4);
+  cube.slices = newSections(4);
+  cube.walls = newSections(4);
+  cube.valid = true;
+  cube.complete = false;
+  cube.invalidList = [];
+  cube.newestNumber = {id: "", value: null};
+  return cube;
+  }
 
-    this.Matrix = new Array(4).fill().map(()=>Array(4).fill());
-    this.PopulateMatrix = function() {
-      this.Matrix.forEach(line => line.fill(Array.from(new Array(16), (x, i) => i)));
-    };
-    this.RotateFaceClockwise = function(save = false) {
-      this.Matrix = this.Matrix[0].map((val, index) => this.Matrix.map(row => row[index]).reverse());
-      return this;
-    };
-    this.RotateFaceCounterClockwise = function(save = false) {
-      this.Matrix = this.Matrix[0].map((val, index) => this.Matrix.map(row => row[row.length-1-index]));
-      return this;
-    };
-    this.RotateFaceUpsideDown = function(save= false) {
-      var semi = this.Matrix[0].map((val, index) => this.Matrix.map(row => row[index]).reverse());
-      this.Matrix = semi[0].map((val, index) => semi.map(row => row[index]).reverse());
-      return this;
+  function newFaces(count) {
+    var faceList = [];
+    for (var i = 0; i <= count - 1; i++) {
+      var face = new Object();
+      face.id = String(i);
+      face.cells = newCells(16, face.id);
+    // face.matrix = new Array(4).fill();
+      face.PopulateMatrix = function() {
+        face.Matrix.forEach(line => line.fill(Array.from(new Array(16), (x, i) => i)));
+      };
+      faceList.push(face);
+    }
+    return faceList;
+  }
+
+  function newCells(count, faceId) {
+    var cellList = [];
+    for (var i = 0; i <= count - 1; i++) {
+      var cell = new Object();
+      cell.id = `${faceId}-${i}`;
+      cell.value = null;
+      cell.invalid = false;
+      cell.superpositions = newSuperPositions(16, cell.id);
+      cellList.push(cell);
+    }
+    return cellList;
+  }
+
+  function newSuperPositions(count, cellId) {
+    var superPositionList = [];
+    for (var i = 0; i <= count - 1; i++) {
+      var superPosition = {id: `${cellId}-${i}`, value: null};
+    superPositionList.push(superPosition);
+    }
+    return superPositionList;
+  }
+
+  function newSections(count) {
+    var sectionList = [];
+    for (var i = 0; i <= count; i++) {
+      var section = {id: null, matrix: {}};
+      sectionList.push(section);
+    }
+    return section;
+  }
+
+  function populateCube(cube) {
+      populateFaces(cube.faces);
+      //populateSlabs(cube.slabs);
+      //populateSlices(cube.slices);
+      //populateWalls(cube.walls);
+    }
+
+  function populateFaces(faces) {
+    for (var i = 0; i <= 5; i++) {
+      faces[i].id = i;
+      populateCells(faces[i]);
+      //populateSlabs(cube.slabs);
+      //populateSlices(cube.slices);
+      //populateWalls(cube.walls);
     }
   }
 
-  function setupNewCube() {
-    var cube = {
-      faces: createFaces(6),
-      slabs: createSlabs(4),
-      slices: createSlices(4),
-      walls: createWalls(4),
-      valid: true,
-      complete: false,
-      invalid: [""],
-      newestNumber: ['', '']
-    };
-    assignPositionalIds(cube.faces);
-    setFaceColors(cube);
-    syncAll(cube.faces, cube.slabs, cube.slices, cube.walls);
-    displayAll(cube);
-    return cube;
-  }
+  function populateCells(face) {
+    //console.log(face);
+//    for (var i = 0; i <= 15; i++) {
 
+  }
 // Visual Functions
 // -------------------------------------------------------------------------------------
 function initializeUnwrappedCanvasCube() {

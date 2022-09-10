@@ -20,12 +20,16 @@
   </div>
   <script>
     initializeUnwrappedCanvasCube();
-    setCellState("2-4-5", "invisible", "");
-    setCellState("2-1", "filled", 13);
-    setCellState("3-10", "invalid", 4);
-    setCellState("4-3", "invalid", 12);
-    setCellState("3-0", "new", 6);
-    setCellState("0-5", "new", 14);
-    // completedCube();
+    var cube = newCube();
+    populateCube(cube);
+    console.log(cube);
+
+//    setCellState("2-4-5", "invisible", "");
+//    setCellState("2-1", "filled", 13);
+//    setCellState("3-10", "invalid", 4);
+//    setCellState("4-3", "invalid", 12);
+//    setCellState("3-0", "new", 6);
+//    setCellState("0-5", "new", 14);
+//    // completedCube();
   </script>
 </html>
