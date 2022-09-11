@@ -9,20 +9,28 @@
     <div class="empty"></div>
     <div class="empty"></div>
     <div class="empty"></div>
+    <button class="buttonA buttonB" onclick="showSections()">Toggle Sections</button>
     <div id="1" class="face blue"></div>
     <div id="2" class="face orange"></div>
     <div id="3" class="face green"></div>
     <div id="4" class="face red"></div>
+    <div class="empty"></div>
     <div id="5" class="face yellow"></div>
     <div class="empty"></div>
     <div class="empty"></div>
     <div class="empty"></div>
+    <div class="empty"></div>
+  </div>
+  <div id="slabs" class="sections slabs"></div>
+  <div id="slices" class="sections slices"></div>
+  <div id="walls" class="sections walls"></div>
   </div>
   <script>
     initializeUnwrappedCanvasCube();
     var cube = newCube();
     populateCube(cube);
     console.log(cube);
+    updateCube(cube);
 
 //    setCellState("2-4-5", "invisible", "");
 //    setCellState("2-1", "filled", 13);

@@ -35,7 +35,7 @@ function newCube() {
       cell.id = `${faceId}-${i}`;
       cell.value = null;
       cell.invalid = false;
-      cell.superpositions = newSuperPositions(16, cell.id);
+      cell.superPositions = newSuperPositions(16, cell.id);
       cellList.push(cell);
     }
     return cellList;
@@ -44,7 +44,7 @@ function newCube() {
   function newSuperPositions(count, cellId) {
     var superPositionList = [];
     for (var i = 0; i <= count - 1; i++) {
-      var superPosition = {id: `${cellId}-${i}`, value: null};
+      var superPosition = {id: `${cellId}-${i}`, value: i+1};
     superPositionList.push(superPosition);
     }
     return superPositionList;
@@ -60,7 +60,7 @@ function newCube() {
   }
 
   function populateCube(cube) {
-      populateFaces(cube.faces);
+      //populateFaces(cube.faces);
       //populateSlabs(cube.slabs);
       //populateSlices(cube.slices);
       //populateWalls(cube.walls);
@@ -68,8 +68,8 @@ function newCube() {
 
   function populateFaces(faces) {
     for (var i = 0; i <= 5; i++) {
-      faces[i].id = i;
-      populateCells(faces[i]);
+      //faces[i].id = i;
+      //populateCells(faces[i]);
       //populateSlabs(cube.slabs);
       //populateSlices(cube.slices);
       //populateWalls(cube.walls);
@@ -83,29 +83,76 @@ function newCube() {
   }
 // Visual Functions
 // -------------------------------------------------------------------------------------
+function ShowHideSections() {
+
+}
 function initializeUnwrappedCanvasCube() {
   for (var i = 0; i <= 5; i++) {
-    document.getElementById(i).innerHTML = initializeUnwrappedCanvasFace(i);
+    document.getElementById(i).innerHTML = initializeUnwrappedCanvasFace(i, 16);
+      //document.getElementById("slices").innerHTML += initializeUnwrappedCanvasSection(i, "slice");
+      //document.getElementById("walls").innerHTML += initializeUnwrappedCanvasSection(i, "wall");
   }
+  document.getElementById("slabs").innerHTML = initializeUnwrappedCanvasSection("slab");
+  document.getElementById("slices").innerHTML = initializeUnwrappedCanvasSection("slices");
+  document.getElementById("walls").innerHTML = initializeUnwrappedCanvasSection("walls");
 }
 
-function initializeUnwrappedCanvasFace(faceId) {
+function initializeUnwrappedCanvasFace(faceId, count) {
   var html = "";
-  for (var i = 0; i <= 15; i++) {
+  for (var i = 0; i <= count - 1; i++) {
     var id = faceId + "-" + i;
-    html += "<div id=\"" + id + "\"class=\"cell\">" + initializeUnwrappedCanvasCell(id) + "</div>"
+    html += "<div id=\"" + id + "\"class=\"cell\">" + initializeUnwrappedCanvasCell(id, 16) + "</div>"
   }
   return html;
 }
 
-function initializeUnwrappedCanvasCell(cellId) {
+function initializeUnwrappedCanvasCell(cellId, count) {
   var html = "";
-  for (var i = 0; i <= 15; i++) {
+  for (var i = 0; i <= count - 1; i++) {
     var id = cellId + "-" + i;
-    html += "<div id=\"" + id + "\"class=\"cell-row\">15</div>"
+    html += "<div id=\"" + id + "\"class=\"cell-row\"></div>"
   }
   return html;
 }
+
+function initializeUnwrappedCanvasSection(sectionsId) {
+  var html = "";
+  for (var i = 0; i <= 3; i++) {
+    var id = sectionsId + "-" + i;
+    html += "<div id=\"" + id + "\"class=\"section\">" + initializeUnwrappedCanvasSubSection(id) + "</div>"
+  }
+  return html;
+}
+
+function initializeUnwrappedCanvasSubSection(sectionId) {
+  var html = "";
+  for (var i = 0; i <= 3; i++) {
+    var id = sectionId + "-" + i;
+    html += "<div id=\"" + id + "\"class=\"sub-section\">" + initializeUnwrappedCanvasFace(id, 4) + "</div>"
+  }
+  return html;
+}
+
+// Update Functions
+// -------------------------------------------------------------------------------------
+function updateCube(cube) {
+  cube.faces.forEach(face => {updateFace(face)});
+}
+
+function updateFace(face) {
+  //console.log(face);
+  face.cells.forEach(cell => {updateCell(cell)});
+}
+
+function updateCell(cell) {
+  cell.superPositions.forEach(sp => {updateSuperPosition(sp)});
+}
+
+function updateSuperPosition(superPosition) {
+  document.getElementById(superPosition.id).innerHTML = superPosition.value - 1;
+}
+
+// -------------------------------------------------------------------------------------
 
 function setCellState(id, status, value) {
   var element = document.getElementById(id);
@@ -120,3 +167,14 @@ function completedCube() {
   }
 }
 // -------------------------------------------------------------------------------------
+
+function showSections() {
+  var sections = document.getElementsByClassName("sections");
+  for (let section of sections) {
+    if (section.style.display === "grid") {
+      section.style.display = "none";
+    } else {
+      section.style.display = "grid";
+    }
+  }
+}
