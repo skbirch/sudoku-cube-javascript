@@ -20,9 +20,9 @@ function newCube() {
       face.id = String(i);
       face.cells = newCells(16, face.id);
     // face.matrix = new Array(4).fill();
-      face.PopulateMatrix = function() {
-        face.Matrix.forEach(line => line.fill(Array.from(new Array(16), (x, i) => i)));
-      };
+      //face.PopulateMatrix = function() {
+        //face.Matrix.forEach(line => line.fill(Array.from(new Array(16), (x, i) => i)));
+      //};
       faceList.push(face);
     }
     return faceList;
@@ -89,8 +89,6 @@ function ShowHideSections() {
 function initializeUnwrappedCanvasCube() {
   for (var i = 0; i <= 5; i++) {
     document.getElementById(i).innerHTML = initializeUnwrappedCanvasFace(i, 16);
-      //document.getElementById("slices").innerHTML += initializeUnwrappedCanvasSection(i, "slice");
-      //document.getElementById("walls").innerHTML += initializeUnwrappedCanvasSection(i, "wall");
   }
   document.getElementById("slabs").innerHTML = initializeUnwrappedCanvasSection("slab");
   document.getElementById("slices").innerHTML = initializeUnwrappedCanvasSection("slices");
@@ -110,7 +108,7 @@ function initializeUnwrappedCanvasCell(cellId, count) {
   var html = "";
   for (var i = 0; i <= count - 1; i++) {
     var id = cellId + "-" + i;
-    html += "<div id=\"" + id + "\"class=\"cell-row\"></div>"
+    html += "<div onmouseover=\"bigOutline(this)\" onmouseout=\"smallOutline(this)\" id=\"" + id + "\"class=\"cell-row\"></div>"
   }
   return html;
 }
@@ -133,10 +131,22 @@ function initializeUnwrappedCanvasSubSection(sectionId) {
   return html;
 }
 
+function bigOutline(x) {
+  x.style['font-weight'] = "bold";
+  x.style['border'] = "1px solid black";
+}
+
+function smallOutline(x) {
+  x.style['font-weight'] = "normal";
+  x.style['border'] = "1px solid grey";
+}
 // Update Functions
 // -------------------------------------------------------------------------------------
 function updateCube(cube) {
   cube.faces.forEach(face => {updateFace(face)});
+  //cube.slabs.forEach(section => {updateSection(section, "slab")});
+  //cube.slices.forEach(section => {updateSection(section, "slice")});
+  //cube.walls.forEach(section => {updateSection(section, "wall")});
 }
 
 function updateFace(face) {
@@ -150,6 +160,34 @@ function updateCell(cell) {
 
 function updateSuperPosition(superPosition) {
   document.getElementById(superPosition.id).innerHTML = superPosition.value - 1;
+}
+
+function updateSection(section, type) {
+  switch(type) {
+    case "slab":
+    //do a thing
+    break;
+    case "slice":
+    //do a thing
+    break;
+    case "walls":
+    //do a thing
+  }
+}
+
+function rotateMatrix(matrix, direction) {
+  switch(direction) {
+    case "clockwise":
+    return matrix[0].map((val, index) => matrix.map(row => row[index]).reverse());
+    break;
+    case "counter-clockwise":
+    return matrix[0].map((val, index) => matrix.map(row => row[row.length-1-index]));
+    break;
+    case "upside-down":
+    var semi = matrix[0].map((val, index) => matrix.map(row => row[index]).reverse());
+    return semi[0].map((val, index) => matrix.map(row => row[index]).reverse());
+    //do a thing
+  }
 }
 
 // -------------------------------------------------------------------------------------

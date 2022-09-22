@@ -64,6 +64,7 @@ border-radius: 3px;
 font-size: 60%;
 justify-content: center; /* align horizontal */
 align-items: center; /* align vertical */
+cursor: pointer;
 }
 
 .sections {
