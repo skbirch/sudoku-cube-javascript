@@ -3,9 +3,9 @@
 function newCube() {
   var cube = new Object();
   cube.faces = newFaces(6);
-  cube.slabs = newSections(4);
-  cube.slices = newSections(4);
-  cube.walls = newSections(4);
+  cube.slabs = newSections(cube.faces, "slabs");
+  cube.slices = newSections(cube.faces, "slices");
+  cube.walls = newSections(cube.faces, "walls");
   cube.valid = true;
   cube.complete = false;
   cube.invalidList = [];
@@ -50,14 +50,23 @@ function newCube() {
     return superPositionList;
   }
 
-  function newSections(count) {
+  function newSections(faceList, type) {
     var sectionList = [];
-    for (var i = 0; i <= count; i++) {
-      var section = {id: null, matrix: {}};
+    for (var i = 0; i <= 3; i++) {
+      if (type == "slabs") {
+        var section = {id: "slab-" + i, matrix: [
+          faceList[1].cells.chunkArray(4)[i],
+          faceList[2].cells.chunkArray(4)[i],
+          faceList[3].cells.chunkArray(4)[i],
+          faceList[4].cells.chunkArray(4)[i]
+        ]};
+      }                                             // <----------------------------   Fix id
+      //var section = {id: null, matrix: {}};
       sectionList.push(section);
     }
-    return section;
+    return sectionList;
   }
+
 
   function populateCube(cube) {
       //populateFaces(cube.faces);
@@ -83,9 +92,18 @@ function newCube() {
   }
 // Visual Functions
 // -------------------------------------------------------------------------------------
-function ShowHideSections() {
-
+function showSections() {
+  var sections = document.getElementsByClassName("sections");
+  for (let section of sections) {
+    // remove this line to enable toggle
+    if (section.style.display === "grid") {
+      section.style.display = "none";
+    } else {
+      section.style.display = "grid";
+    }
+  }
 }
+
 function initializeUnwrappedCanvasCube() {
   for (var i = 0; i <= 5; i++) {
     document.getElementById(i).innerHTML = initializeUnwrappedCanvasFace(i, 16);
@@ -176,19 +194,30 @@ function updateSection(section, type) {
 }
 
 function rotateMatrix(matrix, direction) {
+  var rotatedMatrix = matrix.chunkArray(4);
   switch(direction) {
     case "clockwise":
-    return matrix[0].map((val, index) => matrix.map(row => row[index]).reverse());
+    return rotatedMatrix[0].map((val, index) => rotatedMatrix.map(row => row[index]).reverse()).flat();
     break;
     case "counter-clockwise":
-    return matrix[0].map((val, index) => matrix.map(row => row[row.length-1-index]));
+    return rotatedMatrix[0].map((val, index) => rotatedMatrix.map(row => row[row.length-1-index])).flat();
     break;
     case "upside-down":
-    var semi = matrix[0].map((val, index) => matrix.map(row => row[index]).reverse());
-    return semi[0].map((val, index) => matrix.map(row => row[index]).reverse());
+    var semi = rotatedMatrix[0].map((val, index) => rotatedMatrix.map(row => row[index]).reverse());
+    return semi[0].map((val, index) => rotatedMatrix.map(row => row[index]).reverse()).flat();
     //do a thing
   }
 }
+
+// Subdivides array
+Object.defineProperty(Array.prototype, 'chunkArray', {
+  value: function(chunkSize) {
+    var R = [];
+    for (var i = 0; i < this.length; i += chunkSize)
+      R.push(this.slice(i, i + chunkSize));
+    return R;
+  }
+});
 
 // -------------------------------------------------------------------------------------
 
